@@ -1,0 +1,65 @@
+//a C++ code that simulates a sporadic server handling sporadic tasks:
+
+#include <iostream>
+#include <queue>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+// Structure to represent a sporadic task
+struct Task {
+    int executionTime;     // Worst-case execution time (WCET)
+    int interArrivalTime;  // Minimum inter-arrival time
+    int deadline;          // Relative deadline
+};
+
+// Function to simulate the sporadic server
+void sporadicServerSimulation(int numTasks, int simulationTime) {
+    srand(time(NULL));
+
+    queue<Task> taskQueue;
+    int currentTime = 0;
+
+    // Generate sporadic tasks with random parameters
+    for (int i = 0; i < numTasks; ++i) {
+        Task task;
+        task.executionTime = rand() % 10 + 1;     // Random execution time between 1 and 10
+        task.interArrivalTime = rand() % 10 + 1;  // Random inter-arrival time between 1 and 10
+        task.deadline = rand() % 10 + 10;         // Random relative deadline between 10 and 19
+        taskQueue.push(task);
+    }
+
+    // Simulate sporadic server behavior
+    while (currentTime <= simulationTime) {
+        if (!taskQueue.empty()) {
+            Task currentTask = taskQueue.front();
+            taskQueue.pop();
+
+            // Check if task can be executed within its allocated budget
+            if (currentTask.executionTime <= currentTask.deadline - currentTime) {
+                cout << "Task executed. Execution Time: " << currentTask.executionTime
+                    << ", Deadline: " << currentTask.deadline << ", Result: Success" << endl;
+            }
+            else {
+                cout << "Task executed. Execution Time: " << currentTask.executionTime
+                    << ", Deadline: " << currentTask.deadline << ", Result: Missed Deadline" << endl;
+            }
+
+            currentTime += currentTask.interArrivalTime;
+        }
+        else {
+            // No tasks in the queue, advance the time
+            currentTime++;
+        }
+    }
+}
+
+int main() {
+    int numTasks = 5;           // Number of sporadic tasks to simulate
+    int simulationTime = 100;   // Total simulation time
+
+    sporadicServerSimulation(numTasks, simulationTime);
+
+    return 0;
+}
